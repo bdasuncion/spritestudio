@@ -32,7 +32,7 @@ public class MultiSpriteAnimationPanel extends JPanel implements ActionListener 
     	scale = 4;
     	framesPassed = 0;
     	currentFrame = 0;
-    	baseX = 24;
+    	baseX = 16;
     	baseY = 16;
     	animationUpdate = new Timer(sixtyFramesPerSecond, this);
     	animationUpdate.start();
@@ -71,8 +71,8 @@ public class MultiSpriteAnimationPanel extends JPanel implements ActionListener 
  			
  			
  			disp = spriteFrame.getImage();
- 			g2D.drawImage(disp, baseX + (spriteFrame.getXOffset()*scale) + flipXOffset, 
- 					baseY + (spriteFrame.getYOffset()*scale) + flipYOffset, 
+ 			g2D.drawImage(disp, baseX*scale + (spriteFrame.getXOffset()*scale) + flipXOffset, 
+ 					baseY*scale + (spriteFrame.getYOffset()*scale) + flipYOffset, 
  					flipHorizontal*spriteFrame.getImage().getWidth()*scale,
  		 			flipVertical*spriteFrame.getImage().getHeight()*scale, this);
 

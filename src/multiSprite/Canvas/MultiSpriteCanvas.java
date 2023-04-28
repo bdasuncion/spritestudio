@@ -28,7 +28,9 @@ public class MultiSpriteCanvas extends JPanel implements MultiSpriteFrameInterfa
     	 this.enableEvents(AWTEvent.MOUSE_EVENT_MASK|AWTEvent.MOUSE_WHEEL_EVENT_MASK);
     	 this.setVisible(true);
     	 scale = 4;
-    	 baseX = 32;
+    	 //baseX = 32;
+    	 //baseY = 16;
+    	 baseX = 16;
     	 baseY = 16;
      }
     
@@ -66,8 +68,8 @@ public class MultiSpriteCanvas extends JPanel implements MultiSpriteFrameInterfa
  			
  			
  			disp = spriteFrame.getImage();
- 			g2D.drawImage(disp, baseX + (spriteFrame.getXOffset()*scale) + flipXOffset, 
- 					baseY + (spriteFrame.getYOffset()*scale) + flipYOffset, 
+ 			g2D.drawImage(disp, baseX*scale + (spriteFrame.getXOffset()*scale) + flipXOffset, 
+ 					baseY*scale + (spriteFrame.getYOffset()*scale) + flipYOffset, 
  					flipHorizontal*spriteFrame.getImage().getWidth()*scale,
  		 			flipVertical*spriteFrame.getImage().getHeight()*scale, this);
 
