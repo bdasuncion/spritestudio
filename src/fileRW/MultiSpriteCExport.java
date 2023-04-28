@@ -41,7 +41,7 @@ public class MultiSpriteCExport {
 		// TODO Auto-generated constructor stub
 	}
     
-    public void write(File outputFile, String baseName, MultiSpriteAnimation multiSpriteAnimation) {
+    public void write(File outputFile, String baseName, MultiSpriteAnimation multiSpriteAnimation, boolean compressFiles) {
     	Collection<String> cBaseImageFiles = multiSpriteAnimation.getSourceFiles();
     	
     	Map<String, IndexColorModel> palleteMap = new HashMap<String, IndexColorModel>();
@@ -59,7 +59,11 @@ public class MultiSpriteCExport {
             
             File cImageFile = new File(outputFile.getParent() + "\\" + cFileName);
             //System.out.println(cImageFile.getName());
-            ExportToC.expToCGBA1DLZSSFrame(cImageFile, cSpriteBaseName, images, ssfr.getPalette());
+            if (compressFiles) {
+            	ExportToC.expToCGBA1DLZSSFrame(cImageFile, cSpriteBaseName, images, ssfr.getPalette());
+            } else {
+            	ExportToC.exportToCGBA1DPerFrame(cImageFile, cSpriteBaseName, images, ssfr.getPalette());
+            }
             palleteMap.put(cSpriteBaseName + "_pal", ssfr.getPalette());
             allPalletes.add(ssfr.getPalette());
             File hImageFile  = new File(outputFile.getParent() + "\\" + "sprite_" + cSpriteBaseName + ".h");
@@ -76,7 +80,7 @@ public class MultiSpriteCExport {
     	mapUniquePalletteToIndex(palleteMap, uniquePalleteArray, indexPalletteMap);
     	try {
     		FileWriter cFile = new FileWriter(outputFile);
-	    	writeSpriteSet(cFile, baseName, multiSpriteAnimation, indexPalletteMap);
+	    	writeSpriteSet(cFile, baseName, multiSpriteAnimation, indexPalletteMap, compressFiles);
 	    	
 	      	cFile.flush();
 	    	cFile.close();
@@ -141,12 +145,12 @@ public class MultiSpriteCExport {
     }
     
     private void writeSpriteSet(FileWriter fileOut, String baseName, MultiSpriteAnimation multiSpriteAnimation,
-    		Map<String, Integer> indexPalletteMap) throws IOException {
+    		Map<String, Integer> indexPalletteMap, boolean compressFiles) throws IOException {
     	int count = 0;
     	Vector<String> spriteSetNames = new Vector<String>();
     	for (SpriteFrameSet spriteFrameSet : multiSpriteAnimation.getAnimation()) {
     		spriteSetNames.add(writeSpriteLayerSet(fileOut, baseName, count, 
-    				spriteFrameSet, indexPalletteMap));
+    				spriteFrameSet, indexPalletteMap, compressFiles));
     		++count;
     	}
     	
@@ -165,7 +169,7 @@ public class MultiSpriteCExport {
     }
     
     private String writeSpriteLayerSet(FileWriter fileOut, String baseName, int count, 
-    		SpriteFrameSet spriteFrameSet, Map<String, Integer> indexPalletteMap) throws IOException {
+    		SpriteFrameSet spriteFrameSet, Map<String, Integer> indexPalletteMap, boolean compressFiles) throws IOException {
     	
     	Vector<SpriteFrame> spriteFrames = spriteFrameSet.getSpriteFrames();
     	int spriteOffset = 0;
@@ -175,7 +179,7 @@ public class MultiSpriteCExport {
     	
     	fileOut.write("const SpriteLayer " + frameName + "[]" + " = {\n");
     	for(int idx = spriteFrames.size() - 1; idx >= 0; --idx) {
-    		spriteOffset = writeSpriteLayer(fileOut, spriteFrames.get(idx), spriteOffset, indexPalletteMap);
+    		spriteOffset = writeSpriteLayer(fileOut, spriteFrames.get(idx), spriteOffset, indexPalletteMap, compressFiles);
     		++paletteOffset;
     		if (idx > 0) {
     			fileOut.write(",\n");
@@ -186,7 +190,7 @@ public class MultiSpriteCExport {
     }
     
     private int writeSpriteLayer(FileWriter fileOut, SpriteFrame spriteFrame, int spriteOffset, 
-    		Map<String, Integer> indexPalletteMap) throws IOException {
+    		Map<String, Integer> indexPalletteMap, boolean compressFiles) throws IOException {
     	
     	fileOut.write("    {");
     	
@@ -223,7 +227,7 @@ public class MultiSpriteCExport {
     	fileOut.write((spriteFrame.isFlippedHorizontal() ? DO_HFLIP : NO_HFLIP) + ",");
     	fileOut.write((spriteFrame.isFlippedVertical() ? DO_VFLIP : NO_VFLIP) + ",");
     	
-    	fileOut.write(LZSS_COMPRESSION + ",");
+    	fileOut.write((compressFiles ? LZSS_COMPRESSION : NO_COMPRESSION) + ",");
     	
     	fileOut.write(spriteOffset + ",");
     	//System.out.print("PALETTE NAMEXX:" + palleteName + "\n");

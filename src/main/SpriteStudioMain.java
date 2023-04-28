@@ -27,6 +27,7 @@ import fileRW.BraveKnightFileFilter;
 import fileRW.ConvertFileToTiles;
 import fileRW.SpriteStudioFileReader;
 import fileRW.SpriteStudioFileWriter;
+import fileRW.TileFileFilter;
 import infoObjects.MultiSpriteAnimation;
 import javafx.stage.FileChooser;
 import fileRW.ExportToC;
@@ -54,6 +55,7 @@ public class SpriteStudioMain
 	private JMenuItem export1DGBALZSS;
 	private JMenuItem export1DGBALZSSFrame;
 	private JMenuItem exportMultiSprite;
+	private JMenuItem exportMultiSpriteUncompressed;
 	private JMenuItem convertToTiles; 
 	private JMenuItem exit; 
 	private JTabbedPane FilePane; 
@@ -111,6 +113,10 @@ public class SpriteStudioMain
 		exportMultiSprite.addActionListener(new exportMultiSpriteGBA());
 		exportMultiSprite.setEnabled(false);
 		
+		exportMultiSpriteUncompressed = new JMenuItem("Export to GBA Multisprite Uncompressed");
+		exportMultiSpriteUncompressed.addActionListener(new exportMultiSpriteGBAUncompressed());
+		exportMultiSpriteUncompressed.setEnabled(false);
+		
 	 	convertToTiles = new JMenuItem("Convert To Tiles");
 		convertToTiles.addActionListener(new convertToTiles());
 		
@@ -127,6 +133,7 @@ public class SpriteStudioMain
 		fileMenu.add(export1DGBALZSS);
 		fileMenu.add(export1DGBALZSSFrame);
 		fileMenu.add(exportMultiSprite);
+		fileMenu.add(exportMultiSpriteUncompressed);
 		fileMenu.add(convertToTiles);
 		fileMenu.add(exit);
 		mainMenu.add(fileMenu);
@@ -355,7 +362,30 @@ public class SpriteStudioMain
 			String name = multiSpriteFile.getName();
 			name = name.substring(0, name.lastIndexOf("."));
 			File outputFile = new File(multiSpriteFile.getParent() + "//" + "spriteset_" + name  + ".thumb.c");
-			fileExporter.write(outputFile, name, multiSpriteAnimation);
+			fileExporter.write(outputFile, name, multiSpriteAnimation, true);
+		}
+		
+	}
+	
+	class exportMultiSpriteGBAUncompressed implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			//JFileChooser exporter = new JFileChooser();
+			//exporter.setAcceptAllFileFilterUsed(false);
+			//exporter.setFileFilter(new CFileFilter());
+			//exporter.showDialog(MainFrame, "Export");
+			
+			MultiSpriteDesktop desktop = (MultiSpriteDesktop)FilePane.getSelectedComponent();
+			File multiSpriteFile = desktop.getFile();
+			
+			MultiSpriteAnimation multiSpriteAnimation = desktop.getMultiSpriteAnimation();
+			MultiSpriteCExport fileExporter = new MultiSpriteCExport();
+						
+			String name = multiSpriteFile.getName();
+			name = name.substring(0, name.lastIndexOf("."));
+			File outputFile = new File(multiSpriteFile.getParent() + "//" + "spriteset_" + name  + ".thumb.c");
+			fileExporter.write(outputFile, name, multiSpriteAnimation, false);
 		}
 		
 	}
@@ -427,6 +457,7 @@ public class SpriteStudioMain
 				export1DGBALZSS.setEnabled(false);
 				export1DGBALZSSFrame.setEnabled(false);
 				exportMultiSprite.setEnabled(true);
+				exportMultiSpriteUncompressed.setEnabled(true);
 			}
 		}
 		

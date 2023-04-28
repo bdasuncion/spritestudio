@@ -63,6 +63,61 @@ public class ExportToC
 		}
 	}
 	
+	public static void exportToCGBA1DPerFrame(File f, String baseName, BufferedImage[] buffer, IndexColorModel cm)
+	{
+		FileWriter cFile = null;
+		File outFile = new File(f.getParent() + "\\" + appendExtensionC(f.getName()));
+		try {
+			cFile = new FileWriter(outFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		//createPalette16BitGBA(f,cm, cFile);
+		createPalette16BitGBA(f, baseName, cm, cFile);
+		
+		int width = buffer[0].getWidth();
+		int height = buffer[0].getHeight();
+		
+		for(int i = 0; i<buffer.length;i++) {
+			try {
+				cFile.write("const unsigned int " + baseName + "_image" + i + "["
+						+ ((width*height)/(8/cm.getPixelSize()))/4 + "] = \n{\n");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		
+		
+			boolean isLast = true;
+			if(i<buffer.length - 1)
+				isLast = false;
+			if(cm.getPixelSize() == 4)
+				U324BPP1DGBA(buffer[i].getRaster().getDataBuffer(), cFile, buffer[i].getWidth(), buffer[i].getHeight(), isLast);
+			
+			if(i < buffer.length - 1) {
+				try {
+					cFile.write("\n");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			try {
+				cFile.write("};\n");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		
+		try {
+			cFile.flush();
+			cFile.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static void exportToCGBA2D(File f, BufferedImage[] buffer, IndexColorModel cm)
 	{
 		FileWriter cFile = null;
@@ -438,8 +493,9 @@ public class ExportToC
 					try {
 						cFile.write("0x");
 						cFile.write(hexa);
-						if(i < (width*height/2) - 4 || isLast == false)
-							cFile.write(",");						
+						if(i < (width*height/2) - 4 || isLast == false) {
+							cFile.write(",");
+						}
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
