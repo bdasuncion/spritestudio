@@ -359,6 +359,10 @@ public class SpriteFramePanel extends JPanel implements FramePanelInterface,
 		this.sourceFile = sourceFile;
 	}
 	
+	public String getSourceFile() {
+		return this.sourceFile;
+	}
+	
 	public void reload() {
 		if (sourceFile != null) {
 		    File spriteFile = new File(sourceFile);

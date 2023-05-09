@@ -1,15 +1,19 @@
 package multiSprite.Frame;
 
 import java.awt.BorderLayout;
+import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyVetoException;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -23,6 +27,8 @@ public class ImportFrameSelectionFrame extends JInternalFrame implements ActionL
 	SpriteFramePanel spriteFramePanel;
 	UpdateFramesInterface updateFramesInterface;
 	JScrollPane frameView;
+	static final String COMMAND_RELOAD = "RELOAD";
+	static final String COMMAND_DELETE = "DELETE";
 	public ImportFrameSelectionFrame(SpriteStudioFileReader file, String filePath, String fileName, 
 			CanvasInterface ci, UpdateFramesInterface ufi) {
     	super();
@@ -39,9 +45,15 @@ public class ImportFrameSelectionFrame extends JInternalFrame implements ActionL
     	
     	this.setLayout(new FlowLayout());
     	JPanel buttonPanel = new JPanel();
+    	buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.PAGE_AXIS));
     	JButton reloadButton = new JButton("RELOAD");
     	reloadButton.addActionListener(this);
+    	reloadButton.setActionCommand(COMMAND_RELOAD);
+    	JButton deleteButton = new JButton("DELETE");
+    	deleteButton.addActionListener(this);
+    	deleteButton.setActionCommand(COMMAND_DELETE);
     	buttonPanel.add(reloadButton);
+    	buttonPanel.add(deleteButton);
     	//add(buttonPanel);
 
     	
@@ -65,7 +77,21 @@ public class ImportFrameSelectionFrame extends JInternalFrame implements ActionL
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		spriteFramePanel.reload();
-		updateFramesInterface.updateFrames(spriteFramePanel.getAllSpriteFrames());
+		if (e.getActionCommand().contentEquals(COMMAND_RELOAD)) {
+			spriteFramePanel.reload();
+			updateFramesInterface.updateFrames(spriteFramePanel.getAllSpriteFrames());
+		} else if (e.getActionCommand().contentEquals(COMMAND_DELETE)) {
+			int reply = JOptionPane.showConfirmDialog(null, 
+				    "Are you sure you want to delete this?");
+			
+			if (reply == 0) {
+				updateFramesInterface.deleteFrames(spriteFramePanel.getAllSpriteFrames(), spriteFramePanel.getSourceFile());
+				try {
+					this.setClosed(true);
+				} catch (PropertyVetoException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
 	}
 }

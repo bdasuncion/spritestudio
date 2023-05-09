@@ -18,6 +18,7 @@ import fileRW.SpriteStudioFileReader;
 import infoObjects.MultiSpriteAnimation;
 import infoObjects.SpriteFrame;
 import infoObjects.SpriteFrameSet;
+import javafx.util.Pair;
 import multiSprite.Frame.ImportFrameSelectionFrame;
 import multiSprite.Frame.MultiSpriteAnimationFrame;
 import multiSprite.Frame.MultiSpriteAnimationFrameSelectionFrame;
@@ -85,6 +86,43 @@ public class MultiSpriteDesktop  extends JDesktopPane implements
 		}
 		multiSpriteCanvasFrame.getContentPane().repaint();
 		multiSpriteSelectionFrame.getContentPane().repaint();
+	}
+	
+	@Override
+	public void deleteFrames(Vector<SpriteFrame> spriteFramesToDelete, String sourceFileToDelete) {
+		Vector<SpriteFrameSet> spriteFrameSets = animation.getAnimation();
+		
+		for (String sourceFile : animation.getSourceFiles()) {
+			if (sourceFileToDelete.contains(sourceFile)) {
+				animation.getSourceFiles().remove(sourceFile);
+				break;
+			}
+		}
+		
+		for (SpriteFrame spriteFrameToDelete : spriteFramesToDelete) {
+			findAndDelete(spriteFrameToDelete, spriteFrameSets);
+		}
+		
+		multiSpriteCanvasFrame.getContentPane().repaint();
+		multiSpriteSelectionFrame.getContentPane().repaint();
+	}
+	
+	void findAndDelete(SpriteFrame frameToDelete, Vector<SpriteFrameSet> spriteFrameSets) {
+		boolean hasRemoved = true;
+		while(hasRemoved) {
+			hasRemoved = false;
+			for (SpriteFrameSet spriteFrameSet : spriteFrameSets) {
+				int idxFrame = 0;
+				for (SpriteFrame spriteFrame : spriteFrameSet.getSpriteFrames()) {
+					if (frameToDelete.getCompressedFrameName().equalsIgnoreCase(spriteFrame.getCompressedFrameName())) {
+						spriteFrameSet.getSpriteFrames().removeElementAt(idxFrame);
+						hasRemoved = true;
+						break;
+					}
+					++idxFrame;
+				}
+			}
+		}
 	}
 
 	@Override

@@ -19,11 +19,8 @@ import tools.ImageTools;
 
 public class SpriteFrame {
 	private BufferedImage editableImage;
-	//private IndexColorModel imagePalette; 
-	//private int PixelSize;
 	private int xOffset;
 	private int yOffset;
-	//private int drawPriority;
 	private boolean flipVertical;
 	private boolean flipHorizontal;
 	private String srcFileName;
@@ -35,7 +32,6 @@ public class SpriteFrame {
 
 		xOffset = 0;
 		yOffset = 0;
-		//drawPriority = 0;
 		flipVertical = false;
 		flipHorizontal = false;
 		srcFileName = "";
