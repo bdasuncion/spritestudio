@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
+import java.io.File;
 
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
@@ -32,6 +33,7 @@ public class SpriteFrameControlPanel extends JPanel {
 	JMenuItem copyCanvas;
 	JMenuItem addCanvas;
 	JMenuItem deleteCanvas;
+	JMenuItem exportToTilesAs;
 	JMenuItem exportToTiles;
 	JMenuItem addNewLayer;
 	JMenuItem importLayer;
@@ -40,6 +42,7 @@ public class SpriteFrameControlPanel extends JPanel {
 	private SpriteFrameResizeDialog spriteResizeDialog;
 	private SpriteFramePanel spriteFramePanel;
 	private JFrame owner;
+	File exportedTilesFile;
 	
     public SpriteFrameControlPanel(SpriteFramePanel sfp, JFrame owner) {
     	super();
@@ -55,7 +58,9 @@ public class SpriteFrameControlPanel extends JPanel {
 		copyCanvas.addActionListener(new addCopyFrame());
 		deleteCanvas = new JMenuItem("Delete");
 		deleteCanvas.addActionListener(new deleteFrame());
-		exportToTiles = new JMenuItem("Export Tiles");
+		exportToTilesAs = new JMenuItem("Export to Tiles As");
+		exportToTilesAs.addActionListener(new exportImageToTilesAs());
+		exportToTiles = new JMenuItem("Export to Tiles");
 		exportToTiles.addActionListener(new exportImageToTiles());
 		
 		resize = new JMenuItem("Resize");
@@ -63,6 +68,7 @@ public class SpriteFrameControlPanel extends JPanel {
 		mainMenu.add(addCanvas);
 		mainMenu.add(copyCanvas);
 		mainMenu.add(deleteCanvas);
+		mainMenu.add(exportToTilesAs);
 		mainMenu.add(exportToTiles);
 		mainMenu.add(resize);
 		menuBar.add(mainMenu);
@@ -111,18 +117,26 @@ public class SpriteFrameControlPanel extends JPanel {
 		this.repaint();
 	}
     
-    private void exportImageAsTiles() {
-		JFileChooser exporter = new JFileChooser();
-		exporter.setAcceptAllFileFilterUsed(false);
-		exporter.setFileFilter(new TileFileFilter());
-		exporter.showDialog(this, "Export");
-		if(exporter.getSelectedFile() == null)
+    private void exportImageAsTiles(boolean selectFile) {
+    	File tileFileForExport = null;
+    	if (selectFile || exportedTilesFile == null) {
+    		JFileChooser exporter = new JFileChooser();
+    		exporter.setAcceptAllFileFilterUsed(false);
+    		exporter.setFileFilter(new TileFileFilter());
+    		exporter.showDialog(this, "Export");
+    		tileFileForExport = exporter.getSelectedFile();
+    	} else {
+    		tileFileForExport = exportedTilesFile;
+    	}
+		if(tileFileForExport == null)
 			return;
+		
 		//ExportTiles.exportToTiles(exporter.getSelectedFile(), spriteLayerPanel.getActivePanel().getImageAndOffsetOfFrame(), 
 		//		(IndexColorModel)spriteLayerPanel.getActivePanel().getImageAndOffsetOfFrame().getColorModel());
-		ExportTiles.exportToTiles(exporter.getSelectedFile(), 
+		ExportTiles.exportToTiles(tileFileForExport, 
 				spriteFramePanel.getImageAndOffsetOfFrame(), 
 				(IndexColorModel)spriteFramePanel.getImageAndOffsetOfFrame().getColorModel());
+		exportedTilesFile = tileFileForExport;
 	}
     
     class addEmpty implements ActionListener {
@@ -161,7 +175,13 @@ public class SpriteFrameControlPanel extends JPanel {
     
     class exportImageToTiles implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			exportImageAsTiles();
+			exportImageAsTiles(false);
+		}
+	}
+    
+    class exportImageToTilesAs implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			exportImageAsTiles(true);
 		}
 	}
     

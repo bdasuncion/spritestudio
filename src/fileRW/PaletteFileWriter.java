@@ -28,7 +28,6 @@ public class PaletteFileWriter
 	public PaletteFileWriter(File f, IndexColorModel cm, int palDepth) {
 		File file =  new File(f.getParent() + "\\" + appendExtensionPal(f.getName()));
 		
-		System.out.print("HERE");
 		try {
 			fileOutNoBuff = new FileOutputStream(file);
 		} catch (FileNotFoundException e) {
@@ -41,22 +40,18 @@ public class PaletteFileWriter
 		pixelSize = cm.getPixelSize();
 		paletteDepth = palDepth;
 		
-		System.out.print("HERE1");
 		this.createHeader();
 		this.createPalette();
-		System.out.print("HERE2");
 		try {
 			fileOut.flush();
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		System.out.print("HERE3");
 		try {
 			fileOut.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.print("HERE4");
 	}
 	
 	private void createHeader() {	
