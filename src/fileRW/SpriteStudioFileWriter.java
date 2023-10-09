@@ -83,45 +83,45 @@ public class SpriteStudioFileWriter
 	{
 		try {
 			fileOut.write((byte)frames&0xff);
-			fileOut.write((byte)(frames&0x00ff)>>8);
-			fileOut.write((byte)(frames&0x0000ff)>>16);
-			fileOut.write((byte)(frames&0x000000ff)>>24);
+			fileOut.write((byte)((frames&0xff00)>>8));
+			fileOut.write((byte)((frames&0xff0000)>>16));
+			fileOut.write((byte)((frames&0xff000000)>>24));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	
 		try {
 			fileOut.write((byte)width&0xff);
-			fileOut.write((byte)(width&0x00ff)>>8);
-			fileOut.write((byte)(width&0x0000ff)>>16);
-			fileOut.write((byte)(width&0x000000ff)>>24);
+			fileOut.write((byte)((width&0xff00)>>8));
+			fileOut.write((byte)((width&0xff0000)>>16));
+			fileOut.write((byte)((width&0xff000000)>>24));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	
 		try {
 			fileOut.write((byte)height&0xff);
-			fileOut.write((byte)(height&0x00ff)>>8);
-			fileOut.write((byte)(height&0x0000ff)>>16);
-			fileOut.write((byte)(height&0x000000ff)>>24);
+			fileOut.write((byte)((height&0xff00)>>8));
+			fileOut.write((byte)((height&0xff0000)>>16));
+			fileOut.write((byte)((height&0xff000000)>>24));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 		try {
 			fileOut.write((byte)pixelSize&0xff);
-			fileOut.write((byte)(pixelSize&0x00ff)>>8);
-			fileOut.write((byte)(pixelSize&0x0000ff)>>16);
-			fileOut.write((byte)(pixelSize&0x000000ff)>>24);
+			fileOut.write((byte)((pixelSize&0xff00)>>8));
+			fileOut.write((byte)((pixelSize&0xff0000)>>16));
+			fileOut.write((byte)((pixelSize&0xff000000)>>24));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 		try {
 			fileOut.write((byte)paletteDepth&0xff);
-			fileOut.write((byte)(paletteDepth&0x00ff)>>8);
-			fileOut.write((byte)(paletteDepth&0x0000ff)>>16);
-			fileOut.write((byte)(paletteDepth&0x000000ff)>>24);
+			fileOut.write((byte)((paletteDepth&0xff00)>>8));
+			fileOut.write((byte)((paletteDepth&0xff0000)>>16));
+			fileOut.write((byte)((paletteDepth&0xff000000)>>24));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

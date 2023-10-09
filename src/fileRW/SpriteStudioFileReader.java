@@ -63,11 +63,11 @@ public class SpriteStudioFileReader
 	
 	private void readHeader()
 	{
-		frames = (int)(data[0]|data[1]>>8|data[2]>>16|data[3]>>24);
-		width = (int)(data[4]|data[5]>>8|data[6]>>16|data[7]>>24);
-		height = (int)(data[8]|data[9]>>8|data[10]>>16|data[11]>>24);
-		pixelSize = (int)(data[12]|data[13]>>8|data[14]>>16|data[15]>>24);
-		paletteDepth = (int)(data[16]|data[17]>>8|data[18]>>16|data[19]>>24);
+		frames = (int)((data[0]&0xff)|(data[1]<<8)|(data[2]<<16)|(data[3]<<24));
+		width = (int)((data[4]&0xff)|(data[5]<<8)|(data[6]<<16)|(data[7]<<24));
+		height = (int)((data[8]&0xff)|(data[9]<<8)|(data[10]<<16)|(data[11]<<24));
+		pixelSize = (int)((data[12]&0xff)|(data[13]<<8)|(data[14]<<16)|(data[15]<<24));
+		paletteDepth = (int)((data[16]&0xff)|(data[17]<<8)|(data[18]<<16)|(data[19]<<24));
 	}
 	
 	private void readPalette()
