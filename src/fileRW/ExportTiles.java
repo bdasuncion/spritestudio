@@ -75,39 +75,38 @@ public class ExportTiles
 	{
 		try {
 			fileOutBuffer.write((byte)pixelSize&0xff);
-			fileOutBuffer.write((byte)(pixelSize&0x00ff)>>8);
-			fileOutBuffer.write((byte)(pixelSize&0x0000ff)>>16);
-			fileOutBuffer.write((byte)(pixelSize&0x000000ff)>>24);
+			fileOutBuffer.write((byte)((pixelSize&0xff00)>>8));
+			fileOutBuffer.write((byte)((pixelSize&0xff0000)>>16));
+			fileOutBuffer.write((byte)((pixelSize&0xff000000)>>24));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 		try {
 			fileOutBuffer.write((byte)widthInTiles&0xff);
-			fileOutBuffer.write((byte)(widthInTiles&0x00ff)>>8);
-			fileOutBuffer.write((byte)(widthInTiles&0x0000ff)>>16);
-			fileOutBuffer.write((byte)(widthInTiles&0x000000ff)>>24);
+			fileOutBuffer.write((byte)((widthInTiles&0xff00)>>8));
+			fileOutBuffer.write((byte)((widthInTiles&0xff0000)>>16));
+			fileOutBuffer.write((byte)((widthInTiles&0xff000000)>>24));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			fileOutBuffer.write((byte)heightInTiles&0xff);
+			fileOutBuffer.write((byte)((heightInTiles&0xff00)>>8));
+			fileOutBuffer.write((byte)((heightInTiles&0xff0000)>>16));
+			fileOutBuffer.write((byte)((heightInTiles&0xff000000)>>24));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 		try {
-			fileOutBuffer.write((byte)heightInTiles&0xff);
-			fileOutBuffer.write((byte)(heightInTiles&0x00ff)>>8);
-			fileOutBuffer.write((byte)(heightInTiles&0x0000ff)>>16);
-			fileOutBuffer.write((byte)(heightInTiles&0x000000ff)>>24);
+			fileOutBuffer.write((byte)numberOfTiles&0xff);
+			fileOutBuffer.write((byte)((numberOfTiles&0xff00)>>8));
+			fileOutBuffer.write((byte)((numberOfTiles&0xff0000)>>16));
+			fileOutBuffer.write((byte)((numberOfTiles&0xff000000)>>24));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	
-		try {
-			fileOutBuffer.write((byte)numberOfTiles&0xff);
-			fileOutBuffer.write((byte)(numberOfTiles&0x00ff)>>8);
-			fileOutBuffer.write((byte)(numberOfTiles&0x0000ff)>>16);
-			fileOutBuffer.write((byte)(numberOfTiles&0x000000ff)>>24);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}	
 	}
 	
 	private static void writePalette(BufferedOutputStream fileOutBuffer, IndexColorModel paletteData)
