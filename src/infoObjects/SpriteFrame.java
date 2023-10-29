@@ -206,7 +206,8 @@ public class SpriteFrame {
 		} else {
 			Graphics2D g = editableImage.createGraphics();
 			g.setColor(new Color(rgbVal));
-			g.fillOval(x, y, radius, radius);
+			//g.fillOval(x - radius/2, y - radius/2, radius, radius);
+			g.fillRect(x, y, radius, radius);
 		}
 	}
 	

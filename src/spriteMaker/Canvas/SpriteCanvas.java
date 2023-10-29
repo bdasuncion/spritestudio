@@ -40,6 +40,7 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 	private int scale = 1;
 	private int rgbVal = 0;
 	private double startX,startY;
+	private int displayX,displayY;
 	private boolean button1 = false;
 	private boolean imageBGTrans = false;
 	private int tileWidth = 8, tileHeight = 8;
@@ -194,13 +195,6 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 			return;
 		}
 		
-		/*if (spriteFrame.getImage().getHeight() != bgImage.getHeight() || 
-				spriteFrame.getImage().getWidth() != bgImage.getWidth() ||
-				spriteFrame.getImage().getHeight() != bgCover.getHeight() ||
-				spriteFrame.getImage().getWidth() != bgCover.getWidth()) {
-			setBGImage();
-		}*/
-		
 		g2D.scale(scale, scale);
 		//System.out.print("DISPLAY SPRITE FRAME ON CANVAS");
 		disp = g2D.getDeviceConfiguration().
@@ -220,6 +214,12 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 			spriteFrame.getImage().getWidth(),
 			spriteFrame.getImage().getHeight(), this);
 		
+		
+		if (displayX < spriteFrame.getImage().getWidth() && 
+			displayY < spriteFrame.getImage().getHeight()) {
+			g2D.setColor(new Color(rgbVal));
+			g2D.fillRect(displayX, displayY, 1, 1);
+		}
 		if (gridLineVisible) {
 		    drawGrid(g2D, disp);
 		}
@@ -276,6 +276,8 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 		else if((e.getWheelRotation() < 0)){
 			scale++;
 		}
+		displayX = convertMouseX(e);
+		displayY = convertMouseY(e);
 		this.setBounds(0, 0, this.getWidth(), this.getHeight());
 		//this.setPreferredSize(new Dimension(this.getWidth(), this.getHeight()));
 		this.setPreferredSize(new Dimension(spriteFrame.getImage().getWidth()*scale, 
@@ -284,7 +286,14 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 		this.repaint();
 	}
 	
-	public void processMouseMotionEvent(MouseEvent e) {	
+	public void processMouseMotionEvent(MouseEvent e) {
+		if (MouseEvent.MOUSE_MOVED == e.getID()) {
+			displayX = convertMouseX(e);
+			displayY = convertMouseY(e);
+			this.repaint();
+		}
+	//System.out.println(convertMouseX(e) + " " + convertMouseY(e));
+		
 		if(e.getID() == MouseEvent.MOUSE_DRAGGED && button1 == true){
 			int x = convertMouseX(e);
 			int y = convertMouseY(e);
