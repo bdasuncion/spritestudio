@@ -9,9 +9,12 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
 import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
+import java.awt.image.LookupOp;
 import java.awt.image.Raster;
+import java.awt.image.RescaleOp;
 import java.awt.image.WritableRaster;
 import java.util.Hashtable;
 
@@ -29,6 +32,7 @@ public class SpriteFrame {
 	private int stampImgWidth = 1, stampImgHeight = 1;
 	int copied[];
 	boolean isDrawMode = true;
+	BufferedImage copiedImage;
 	
 	public SpriteFrame() {
 		setImage(null);
@@ -174,13 +178,15 @@ public class SpriteFrame {
 
 	public void setCopyImageWidth(int width) {
 		this.copyImageWidth = width;
+		copiedImage = null;
 	}
 	
 	public void setCopyImageHeight(int height) {
 		this.copyImageHeight = height;
+		copiedImage = null;
 	}
 	
-	public BufferedImage copyAt(int x, int y, int width, int height, int rgbArray[]) {
+	public void copyAt(int x, int y, int width, int height, int rgbArray[]) {
 		stampImgWidth = copyImageWidth;
 		if (x + copyImageWidth > editableImage.getWidth()) {
 			stampImgWidth = editableImage.getWidth() - x;
@@ -191,19 +197,20 @@ public class SpriteFrame {
 		}
 		copied = new int[editableImage.getWidth()*editableImage.getHeight()];
 		editableImage.getRGB(x, y, stampImgWidth, stampImgHeight, copied, 0, stampImgWidth);
-		BufferedImage copiedImage = ImageTools.createEmptyImage(stampImgWidth, stampImgHeight, (IndexColorModel) editableImage.getColorModel());
+		copiedImage = ImageTools.createEmptyImage(stampImgWidth, stampImgHeight, (IndexColorModel) editableImage.getColorModel());
 		copiedImage.setRGB(0, 0, stampImgWidth, stampImgHeight, copied, 0, stampImgWidth);
-		return copiedImage;
 	}
 	
 	public void copyModeDrawAt(int x, int y) {
-		editableImage.setRGB(x, y, stampImgWidth, stampImgHeight, copied, 0, stampImgWidth);
+		Graphics2D g = editableImage.createGraphics();
+		g.drawImage(copiedImage, x, y, copiedImage.getWidth(), copiedImage.getHeight(), null);
+		//editableImage.setRGB(x, y, stampImgWidth, stampImgHeight, copied, 0, stampImgWidth);
 	}
 	
 	public void drawAt(int x, int y, int rgbVal) {
 		if (isDrawMode) {
 			drawModeDrawAt(x,y,rgbVal);
-		} else {
+		} else if (copiedImage != null){
 			copyModeDrawAt(x, y);
 		}
 		
@@ -297,6 +304,11 @@ public class SpriteFrame {
 
 	public void setDrawMode(boolean isDrawMode) {
 		this.isDrawMode = isDrawMode;
+		copiedImage = null;
+	}
+
+	public BufferedImage getCopiedImage() {
+		return copiedImage;
 	}
 	
 }
