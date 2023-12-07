@@ -51,12 +51,16 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 	private CanvasButtonPanelInterface canvasButtonPanelInterface;
 	private SpriteFrame spriteFrame;
 	ResizeInterface resizeInterface;
+	int copyWidth = 1, copyHeight = 1, copyRGB[];
+	BufferedImage copiedImage;
 	
 	public SpriteCanvas(int width, int height, int pixelSize, ResizeInterface ri) {
 		super();
 		this.resizeInterface = ri;
 		this.setSize(width,height);
 		this.enableEvents(AWTEvent.MOUSE_EVENT_MASK|AWTEvent.MOUSE_WHEEL_EVENT_MASK|AWTEvent.MOUSE_MOTION_EVENT_MASK|AWTEvent.KEY_EVENT_MASK);
+		
+		copyRGB = new int[width*height];
 		
 		bgImage = ImageTools.createMottledTile(
 				width, height, tileWidth, tileHeight);
@@ -88,10 +92,6 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 	public void setImageBGTransparent(boolean trans){
 		imageBGTrans = trans;
 	}
-	
-	//public void setRGBVal(int newRGB){
-	//	rgbVal = newRGB;
-	//}
 	
 	public void setImageBGtransparent(){
 		bgCover = ImageTools.makeImageBGTransparent(bgCover);
@@ -214,17 +214,27 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 			spriteFrame.getImage().getWidth(),
 			spriteFrame.getImage().getHeight(), this);
 		
-		
+		if (copiedImage != null) {
+			disp = copiedImage;
+			g2D.drawImage(disp, displayX, displayY, 
+					copiedImage.getWidth(),
+					copiedImage.getHeight(), this);
+		}
 		if (displayX < spriteFrame.getImage().getWidth() && 
 			displayY < spriteFrame.getImage().getHeight()) {
-			g2D.setColor(new Color(rgbVal));
-			g2D.fillRect(displayX, displayY, 1, 1);
+			displayDraw(g2D, displayX, displayY, rgbVal);
 		}
+		
 		if (gridLineVisible) {
 		    drawGrid(g2D, disp);
 		}
 		
 		g2D.dispose();
+	}
+	
+	private void displayDraw(Graphics2D g2D, int displayX, int displayY, int rgbVal){
+		g2D.setColor(new Color(rgbVal));
+		g2D.fillRect(displayX, displayY, 1, 1);		
 	}
 	
 	private void drawGrid(Graphics2D g2D, BufferedImage display) {
@@ -257,6 +267,8 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 		if(e.getID() == MouseEvent.MOUSE_PRESSED && e.getButton() == MouseEvent.BUTTON3) {
 			rgbVal = spriteFrame.getImage().getRGB(convertMouseX(e), convertMouseY(e));
 			button1 = false;
+			copiedImage = spriteFrame.copyAt(convertMouseX(e), convertMouseY(e), 0, 0, copyRGB);
+			
 		} else if(e.getID() == MouseEvent.MOUSE_PRESSED && e.getButton() == MouseEvent.BUTTON1) {
 			if(e.getX()/scale < spriteFrame.getImage().getWidth() && 
 					e.getY()/scale < spriteFrame.getImage().getHeight()) {
@@ -292,7 +304,6 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 			displayY = convertMouseY(e);
 			this.repaint();
 		}
-	//System.out.println(convertMouseX(e) + " " + convertMouseY(e));
 		
 		if(e.getID() == MouseEvent.MOUSE_DRAGGED && button1 == true){
 			int x = convertMouseX(e);
@@ -349,11 +360,6 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 		int maxX = spriteFrame.getImage().getWidth();
 		int maxY = spriteFrame.getImage().getHeight();
 		
-		/*bgCover = new BufferedImage(
-				maxX,
-				maxY,
-				spriteFrame.getImage().getType(), 
-				(IndexColorModel) spriteFrame.getImage().getColorModel());*/
 		bgCover = ImageTools.createEmptyImage(maxX, maxY, spriteFrame.getImage().getColorModel().getPixelSize());
 		bgImage = ImageTools.createMottledTile(
 				maxX, maxY, tileWidth, tileHeight);

@@ -26,6 +26,7 @@ public class SpriteFrame {
 	private String srcFileName;
 	private String compressedFrameName;
 	private int radius = 1;
+	private int stampImgWidth = 1, stampImgHeight = 1;
 	
 	public SpriteFrame() {
 		setImage(null);
@@ -60,37 +61,6 @@ public class SpriteFrame {
 		flipVertical = false;
 		flipHorizontal = false;
 	}
-
-	/*private IndexColorModel copyColorModel(IndexColorModel cm) {
-		int numColors = cm.getMapSize();
-		int pixelSize = cm.getPixelSize();
-		byte red[] = new byte[numColors],
-			green[] = new byte[numColors],
-			blue[] = new byte[numColors];
-		cm.getReds(red);
-		cm.getGreens(green);
-		cm.getBlues(blue);
-		
-		return new IndexColorModel(pixelSize,numColors,red, green, blue);
-	}*/
-	
-	/*private BufferedImage copyImage(BufferedImage img) {
-		BufferedImage cpyImg = new BufferedImage(img.getWidth(), img.getHeight(),
-				img.getType(), 
-				(IndexColorModel) copyColorModel(
-				(IndexColorModel) img.getColorModel()));
-		cpyImg.setData(img.getRaster());
-		
-		return cpyImg;
-	}*/
-	
-	/*private BufferedImage copyImage(BufferedImage img, IndexColorModel cm) {
-		BufferedImage cpyImg = new BufferedImage(img.getWidth(), img.getHeight(),
-				img.getType(), (IndexColorModel) copyColorModel(cm));
-		cpyImg.setData(img.getRaster());
-		
-		return cpyImg;
-	}*/
 	
 	public BufferedImage getImage() {
 		return editableImage;
@@ -198,6 +168,30 @@ public class SpriteFrame {
 
 	public void setRadius(int radius) {
 		this.radius = radius;
+	}
+	
+	public BufferedImage copyAt(int x, int y, int width, int height, int rgbArray[]) {
+		stampImgWidth = radius;
+		//if (x + width > editableImage.getWidth()) {
+		if (x + radius > editableImage.getWidth()) {
+			stampImgWidth = editableImage.getWidth() - x;
+		}
+		stampImgHeight = radius;
+		//if (y + height > editableImage.getHeight()) {
+		if (y + radius > editableImage.getHeight()) {
+			stampImgHeight = editableImage.getHeight() - y;
+		}
+		int copied[] = new int[editableImage.getWidth()*editableImage.getHeight()];
+		editableImage.getRGB(x, y, stampImgWidth, stampImgHeight, rgbArray, 0, stampImgWidth);
+		BufferedImage copiedImage = ImageTools.createEmptyImage(stampImgWidth, stampImgHeight, (IndexColorModel) editableImage.getColorModel());
+		copiedImage.setRGB(0, 0, stampImgWidth, stampImgHeight, rgbArray, 0, stampImgWidth);
+		return copiedImage;
+	}
+	
+	public void drawAt(int x, int y, int width, int height, int rgbArray[]) {
+		//if (radius == 1) {
+		editableImage.setRGB(x, y, stampImgWidth, stampImgHeight, rgbArray, 0, width);
+		//}
 	}
 	
 	public void drawAt(int x, int y, int rgbVal) {
