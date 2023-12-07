@@ -25,8 +25,10 @@ public class SpriteFrame {
 	private boolean flipHorizontal;
 	private String srcFileName;
 	private String compressedFrameName;
-	private int radius = 1;
+	private int copyImageWidth = 1, copyImageHeight = 1;
 	private int stampImgWidth = 1, stampImgHeight = 1;
+	int copied[];
+	boolean isDrawMode = true;
 	
 	public SpriteFrame() {
 		setImage(null);
@@ -162,46 +164,59 @@ public class SpriteFrame {
 		this.drawPriority = drawPriority;
 	}*/
 	
-	public int getRadius() {
-		return radius;
+	public int getCopyBlockWidth() {
+		return copyImageWidth;
+	}
+	
+	public int getCopyBlockHeight() {
+		return copyImageHeight;
 	}
 
-	public void setRadius(int radius) {
-		this.radius = radius;
+	public void setCopyImageWidth(int width) {
+		this.copyImageWidth = width;
+	}
+	
+	public void setCopyImageHeight(int height) {
+		this.copyImageHeight = height;
 	}
 	
 	public BufferedImage copyAt(int x, int y, int width, int height, int rgbArray[]) {
-		stampImgWidth = radius;
-		//if (x + width > editableImage.getWidth()) {
-		if (x + radius > editableImage.getWidth()) {
+		stampImgWidth = copyImageWidth;
+		if (x + copyImageWidth > editableImage.getWidth()) {
 			stampImgWidth = editableImage.getWidth() - x;
 		}
-		stampImgHeight = radius;
-		//if (y + height > editableImage.getHeight()) {
-		if (y + radius > editableImage.getHeight()) {
+		stampImgHeight = copyImageHeight;
+		if (y + copyImageHeight > editableImage.getHeight()) {
 			stampImgHeight = editableImage.getHeight() - y;
 		}
-		int copied[] = new int[editableImage.getWidth()*editableImage.getHeight()];
-		editableImage.getRGB(x, y, stampImgWidth, stampImgHeight, rgbArray, 0, stampImgWidth);
+		copied = new int[editableImage.getWidth()*editableImage.getHeight()];
+		editableImage.getRGB(x, y, stampImgWidth, stampImgHeight, copied, 0, stampImgWidth);
 		BufferedImage copiedImage = ImageTools.createEmptyImage(stampImgWidth, stampImgHeight, (IndexColorModel) editableImage.getColorModel());
-		copiedImage.setRGB(0, 0, stampImgWidth, stampImgHeight, rgbArray, 0, stampImgWidth);
+		copiedImage.setRGB(0, 0, stampImgWidth, stampImgHeight, copied, 0, stampImgWidth);
 		return copiedImage;
 	}
 	
-	public void drawAt(int x, int y, int width, int height, int rgbArray[]) {
-		//if (radius == 1) {
-		editableImage.setRGB(x, y, stampImgWidth, stampImgHeight, rgbArray, 0, width);
-		//}
+	public void copyModeDrawAt(int x, int y) {
+		editableImage.setRGB(x, y, stampImgWidth, stampImgHeight, copied, 0, stampImgWidth);
 	}
 	
 	public void drawAt(int x, int y, int rgbVal) {
-		if (radius == 1) {
+		if (isDrawMode) {
+			drawModeDrawAt(x,y,rgbVal);
+		} else {
+			copyModeDrawAt(x, y);
+		}
+		
+	}
+	
+	private void drawModeDrawAt(int x, int y, int rgbVal) {
+		if (copyImageWidth == 1) {
 			editableImage.setRGB(x, y, rgbVal);
 		} else {
 			Graphics2D g = editableImage.createGraphics();
 			g.setColor(new Color(rgbVal));
 			//g.fillOval(x - radius/2, y - radius/2, radius, radius);
-			g.fillRect(x, y, radius, radius);
+			g.fillRect(x, y, copyImageWidth, copyImageWidth);
 		}
 	}
 	
@@ -274,6 +289,14 @@ public class SpriteFrame {
 
 	public void setCompressedFrameName(String compressedFrameName) {
 		this.compressedFrameName = compressedFrameName;
+	}
+
+	public boolean isDrawMode() {
+		return isDrawMode;
+	}
+
+	public void setDrawMode(boolean isDrawMode) {
+		this.isDrawMode = isDrawMode;
 	}
 	
 }

@@ -71,6 +71,13 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 		
 		setPreferredSize(new Dimension(width*scale, height*scale));
 //		allImagesAtCanvasSameIdx = new Vector<SpriteFrameInformation>();
+		BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+
+		// Create a new blank cursor.
+		Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+		    cursorImg, new Point(0, 0), "blank cursor");
+		
+		setCursor(blankCursor);
 	}
 	
 	public void setSpriteLayerPanelInterface(SpriteLayerPanelInterface slpInterface){
@@ -214,15 +221,10 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 			spriteFrame.getImage().getWidth(),
 			spriteFrame.getImage().getHeight(), this);
 		
-		if (copiedImage != null) {
-			disp = copiedImage;
-			g2D.drawImage(disp, displayX, displayY, 
-					copiedImage.getWidth(),
-					copiedImage.getHeight(), this);
-		}
-		if (displayX < spriteFrame.getImage().getWidth() && 
-			displayY < spriteFrame.getImage().getHeight()) {
-			displayDraw(g2D, displayX, displayY, rgbVal);
+		if (spriteFrame.isDrawMode()) {
+			drawBrush(g2D, displayX, displayY, rgbVal);
+		} else {
+			drawCopiedBlock(g2D, disp);
 		}
 		
 		if (gridLineVisible) {
@@ -232,9 +234,31 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 		g2D.dispose();
 	}
 	
-	private void displayDraw(Graphics2D g2D, int displayX, int displayY, int rgbVal){
-		g2D.setColor(new Color(rgbVal));
-		g2D.fillRect(displayX, displayY, 1, 1);		
+	private void drawCopiedBlock(Graphics2D g2D, BufferedImage display) {
+		
+		int width = spriteFrame.getCopyBlockWidth(), height = spriteFrame.getCopyBlockHeight();
+		if (copiedImage != null) {
+			display = copiedImage;
+			g2D.drawImage(display, displayX, displayY, 
+					copiedImage.getWidth(),
+					copiedImage.getHeight(), this);
+			width = copiedImage.getWidth();
+			height = copiedImage.getHeight();
+		}
+		
+		g2D.setStroke(new BasicStroke(0.15f));
+		g2D.drawLine(displayX, displayY, displayX + width, displayY);
+		g2D.drawLine(displayX, displayY, displayX, displayY + height);
+		g2D.drawLine(displayX + width, displayY, displayX + width, displayY + height);
+		g2D.drawLine(displayX, displayY + height, displayX + width, displayY + height);
+	}
+	
+	private void drawBrush(Graphics2D g2D, int displayX, int displayY, int rgbVal){
+		if (displayX < spriteFrame.getImage().getWidth() && 
+				displayY < spriteFrame.getImage().getHeight()) {
+			g2D.setColor(new Color(rgbVal));
+			g2D.fillRect(displayX, displayY, spriteFrame.getCopyBlockWidth(), spriteFrame.getCopyBlockHeight());
+		}		
 	}
 	
 	private void drawGrid(Graphics2D g2D, BufferedImage display) {
@@ -274,11 +298,11 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 					e.getY()/scale < spriteFrame.getImage().getHeight()) {
 				spriteFrame.drawAt(convertMouseX(e), convertMouseY(e), rgbVal);
 			}
-			this.repaint();
 			startX = convertMouseX(e);
 			startY = convertMouseY(e);
 			button1 = true;
 		}
+		repaint();
 	}
 	
 	public void processMouseWheelEvent(MouseWheelEvent e) {
@@ -311,6 +335,8 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 			drawLine(startX, startY, x, y);
 			startX = x;
 			startY = y;
+			displayX = x;
+			displayY = y;
 			this.repaint();
 		}
 	}

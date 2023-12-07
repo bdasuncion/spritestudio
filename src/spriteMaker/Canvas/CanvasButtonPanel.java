@@ -54,15 +54,17 @@ implements ActionListener, ItemListener, CanvasButtonPanelInterface
 	JButton switchLayerToPosition;
 	JRadioButton pixel;
 	JRadioButton tile;
-	JSpinner drawPriority;
 	JCheckBox showAllFrames;
 	JSpinner tileWidthSize;
 	JSpinner tileHeightSize;
-	JSpinner radius;
+	JSpinner width;
+	JSpinner height;
 	JCheckBox transparentBG;
 	JCheckBox gridLinesVisible;
 	BufferedImage image;
 	SpriteCanvas spriteCanvas;
+	JRadioButton drawMode;
+	JRadioButton copyMode;
 	static final String SWITCH_TO_POSITION = "switch_position";
 	static final String SWITCH_TO_EDIT = "switch_edit";
 	static final String SWITCH_TO_LAYER = "switch_layer";
@@ -94,16 +96,16 @@ implements ActionListener, ItemListener, CanvasButtonPanelInterface
 		flipHorizontal.setActionCommand("FLIPH");
 		flipHorizontal.addActionListener(this);
 		
-		//Build background/foreground options
-		SpinnerNumberModel numberModelPriority = new SpinnerNumberModel(0,0,null,1);
-		drawPriority = new JSpinner(numberModelPriority);
-		//drawPriority.addChangeListener(new changeDrawPriority());
-		setSpinnerFormats(drawPriority);
+		ChangeValue changeValue = new ChangeValue();
+		SpinnerNumberModel widthModel = new SpinnerNumberModel(1, 1, 256, 1);
+		width = new JSpinner(widthModel);
+		width.addChangeListener(changeValue);
+		setSpinnerFormats(width);
 		
-		SpinnerNumberModel radiusModel = new SpinnerNumberModel(1, 1, 6, 1);
-		radius = new JSpinner(radiusModel);
-		radius.addChangeListener(new ChangeRadius());
-		setSpinnerFormats(radius);
+		SpinnerNumberModel heightModel = new SpinnerNumberModel(1, 1, 256, 1);
+		height = new JSpinner(heightModel);
+		height.addChangeListener(changeValue);
+		setSpinnerFormats(height);
 		
 		pixel = new JRadioButton("Pixel");
 		pixel.setActionCommand("pixel");
@@ -133,6 +135,17 @@ implements ActionListener, ItemListener, CanvasButtonPanelInterface
 		setSpinnerFormats(tileWidthSize);
 		setSpinnerFormats(tileHeightSize);
 		
+		drawMode = new JRadioButton("Draw");
+		drawMode.setActionCommand("draw");
+		drawMode.addActionListener(this);
+		copyMode = new JRadioButton("Copy");
+		copyMode.setActionCommand("copy");
+		copyMode.addActionListener(this);
+		drawMode.setSelected(true);
+		ButtonGroup modeGroup = new ButtonGroup();
+		modeGroup.add(drawMode);		
+		modeGroup.add(copyMode);
+		
 		JPanel bgDesignControl = new JPanel();
 		GroupLayout bgDesignControlLayout = new GroupLayout(bgDesignControl);
 		bgDesignControl.setLayout(bgDesignControlLayout);
@@ -152,10 +165,16 @@ implements ActionListener, ItemListener, CanvasButtonPanelInterface
 		bgPanel.add(transparentBG);
 		bgPanel.add(gridLinesVisible);
 		
-		JPanel radiusPanel = new JPanel();
-		JLabel radiusLabel = new JLabel("radius");
-		radiusPanel.add(radiusLabel);
-		radiusPanel.add(radius);
+		JPanel modeOptionsPanel = new JPanel();
+		modeOptionsPanel.add(drawMode);
+		modeOptionsPanel.add(copyMode);
+		JLabel widthLabel = new JLabel("width");
+		modeOptionsPanel.add(widthLabel);
+		modeOptionsPanel.add(width);
+		JLabel heightLabel = new JLabel("height");
+		modeOptionsPanel.add(heightLabel);
+		modeOptionsPanel.add(height);
+		
 		
 		JPanel switchFromLayer = new JPanel();
 		switchLayerToPosition = new JButton("<<");
@@ -175,13 +194,13 @@ implements ActionListener, ItemListener, CanvasButtonPanelInterface
 			//addComponent(drawPriorityPanel).
 			addComponent(bgDesignControl).
 			addComponent(bgPanel).
-			addComponent(radiusPanel).
+			addComponent(modeOptionsPanel).
 			addComponent(switchFromLayer));
 		bgControlLayout.setVerticalGroup(bgControlLayout.createSequentialGroup().
 			//addComponent(drawPriorityPanel).
 			addComponent(bgDesignControl).
 			addComponent(bgPanel).
-			addComponent(radiusPanel).
+			addComponent(modeOptionsPanel).
 			addComponent(switchFromLayer));
 		
 		mainPanelImageLayer = new JPanel();
@@ -303,6 +322,13 @@ implements ActionListener, ItemListener, CanvasButtonPanelInterface
 			(((SpinnerNumberModel)tileWidthSize.getModel()).getNumber().intValue(),
 			((SpinnerNumberModel)tileHeightSize.getModel()).getNumber().intValue());
 		}
+		
+		if (command == "copy") {
+			spriteCanvas.getSpriteFrame().setDrawMode(false);
+		} else if(command == "draw") {
+			spriteCanvas.getSpriteFrame().setDrawMode(true);
+		}
+		
 		if(command == INCREASE_TRANSPARENCY)
 			spriteCanvas.setXOffset(command);
 		if(command == DECREASE_TRANSPARENCY)
@@ -377,30 +403,25 @@ implements ActionListener, ItemListener, CanvasButtonPanelInterface
 		}
 	}
 	
-	private class ChangeRadius implements ChangeListener {
+	private class ChangeValue implements ChangeListener {
 		public void stateChanged(ChangeEvent e) {
-			spriteCanvas.getSpriteFrame().setRadius(((SpinnerNumberModel)radius.getModel()).getNumber().intValue());
+			if(e.getSource() == width) {
+				spriteCanvas.getSpriteFrame().setCopyImageWidth(((SpinnerNumberModel)width.getModel()).getNumber().intValue());
+			} else if (e.getSource() == height) {
+				spriteCanvas.getSpriteFrame().setCopyImageHeight(((SpinnerNumberModel)height.getModel()).getNumber().intValue());
+			}
 		}
 	}
-	
-	/*private class changeDrawPriority implements ChangeListener
-	{
-		public void stateChanged(ChangeEvent arg0) {
-			spriteCanvas.setDrawPriority
-			(((SpinnerNumberModel)drawPriority.getModel()).getNumber().intValue());
-		}	
-	}*/
 	
 	public void changeImage(BufferedImage img) {
 		image = img;
 	}
 
 	public void setMaxDrawPriority(int max) {
-		((SpinnerNumberModel)drawPriority.getModel()).setMaximum(max);
 		
 	}
 
 	public void setdrawPriorityValue(int priorityVal) {
-		((SpinnerNumberModel)drawPriority.getModel()).setValue(priorityVal);
+
 	}
 }
