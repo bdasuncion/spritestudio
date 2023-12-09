@@ -186,7 +186,7 @@ public class SpriteFrame {
 		copiedImage = null;
 	}
 	
-	public void copyAt(int x, int y, int width, int height, int rgbArray[]) {
+	public void copyAt(int x, int y) {
 		stampImgWidth = copyImageWidth;
 		if (x + copyImageWidth > editableImage.getWidth()) {
 			stampImgWidth = editableImage.getWidth() - x;

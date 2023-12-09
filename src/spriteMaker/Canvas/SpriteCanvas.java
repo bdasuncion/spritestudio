@@ -24,7 +24,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.DataBuffer;
 import java.awt.image.WritableRaster;
+import java.util.Date;
 import java.util.Hashtable;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 public class SpriteCanvas extends JPanel implements CanvasInterface,
@@ -51,15 +54,36 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 	private CanvasButtonPanelInterface canvasButtonPanelInterface;
 	private SpriteFrame spriteFrame;
 	ResizeInterface resizeInterface;
-	int copyWidth = 1, copyHeight = 1, copyRGB[];
+	Color borderColor;
+	Timer colorChange;
+	private class ColorChanger extends TimerTask {
+
+		int r = 0, g = 0, b = 0;
+		final static int add = 10;
+		@Override
+		public void run() {
+			if (r < 220) {
+				r += add;
+			} else if (g < 240) {
+				g += add;
+			} else if (b < 240) {
+				b += add;
+			} else {
+				r = 0;
+				g = 0;
+				b = 0;
+			}
+			borderColor = new Color(r, g, b);
+			repaint();
+		}
+		
+	};
 	
 	public SpriteCanvas(int width, int height, int pixelSize, ResizeInterface ri) {
 		super();
 		this.resizeInterface = ri;
 		this.setSize(width,height);
 		this.enableEvents(AWTEvent.MOUSE_EVENT_MASK|AWTEvent.MOUSE_WHEEL_EVENT_MASK|AWTEvent.MOUSE_MOTION_EVENT_MASK|AWTEvent.KEY_EVENT_MASK);
-		
-		copyRGB = new int[width*height];
 		
 		bgImage = ImageTools.createMottledTile(
 				width, height, tileWidth, tileHeight);
@@ -77,6 +101,9 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 		    cursorImg, new Point(0, 0), "blank cursor");
 		
 		setCursor(blankCursor);
+		
+		colorChange = new Timer();
+		colorChange.scheduleAtFixedRate(new ColorChanger(),new Date(), 100);
 	}
 	
 	public void setSpriteLayerPanelInterface(SpriteLayerPanelInterface slpInterface){
@@ -256,7 +283,7 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 	}
 	
 	private void drawOutline(Graphics2D g2D, int displayX, int displayY, int width, int height) {
-		g2D.setColor(Color.BLACK);
+		g2D.setColor(borderColor);
 		g2D.setStroke(new BasicStroke(0.15f));
 		g2D.drawLine(displayX, displayY, displayX + width, displayY);
 		g2D.drawLine(displayX, displayY, displayX, displayY + height);
@@ -294,7 +321,7 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 		if(e.getID() == MouseEvent.MOUSE_PRESSED && e.getButton() == MouseEvent.BUTTON3) {
 			rgbVal = spriteFrame.getImage().getRGB(convertMouseX(e), convertMouseY(e));
 			button1 = false;
-			spriteFrame.copyAt(convertMouseX(e), convertMouseY(e), 0, 0, copyRGB);
+			spriteFrame.copyAt(convertMouseX(e), convertMouseY(e));
 			
 		} else if(e.getID() == MouseEvent.MOUSE_PRESSED && e.getButton() == MouseEvent.BUTTON1) {
 			if(e.getX()/scale < spriteFrame.getImage().getWidth() && 
