@@ -344,7 +344,7 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 		}
 		displayX = convertMouseX(e);
 		displayY = convertMouseY(e);
-		this.setBounds(0, 0, this.getWidth(), this.getHeight());
+		//this.setBounds(0, 0, this.getWidth(), this.getHeight());
 		//this.setPreferredSize(new Dimension(this.getWidth(), this.getHeight()));
 		this.setPreferredSize(new Dimension(spriteFrame.getImage().getWidth()*scale, 
 				spriteFrame.getImage().getHeight()*scale));
@@ -378,8 +378,8 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 		if(e.getKeyCode() == KeyEvent.VK_DOWN && scale > 1){
 			scale--;
 		}
-		this.setBounds(0, 0, this.getWidth(), this.getHeight());
-		this.setPreferredSize(new Dimension(this.getWidth(), this.getHeight()));
+		//this.setBounds(0, 0, this.getWidth(), this.getHeight());
+		this.setPreferredSize(new Dimension(this.getWidth()*scale, this.getHeight()*scale));
 		this.revalidate();		
 		this.repaint();
 		

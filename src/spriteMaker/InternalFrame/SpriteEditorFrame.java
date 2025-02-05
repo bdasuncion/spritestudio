@@ -24,8 +24,8 @@ public class SpriteEditorFrame extends JInternalFrame implements ResizeInterface
         spritecanvas = new SpriteCanvas(width, height, pixelSize, this);
 		
 		canvasScrollView = new JScrollPane(spritecanvas);
-		canvasScrollView.setWheelScrollingEnabled(false);
-		
+		//canvasScrollView.setWheelScrollingEnabled(false);
+		//getContentPane().add(canvasScrollView, BorderLayout.CENTER);
 		add(canvasScrollView, BorderLayout.CENTER);
 		
 		buttonPanel = new CanvasButtonPanel(spritecanvas);

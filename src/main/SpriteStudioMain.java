@@ -29,7 +29,6 @@ import fileRW.SpriteStudioFileReader;
 import fileRW.SpriteStudioFileWriter;
 import fileRW.TileFileFilter;
 import infoObjects.MultiSpriteAnimation;
-import javafx.stage.FileChooser;
 import fileRW.ExportToC;
 import fileRW.ExternalFileManager;
 import fileRW.KnightsOfTheRoundFileFilter;

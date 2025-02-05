@@ -18,7 +18,6 @@ import fileRW.SpriteStudioFileReader;
 import infoObjects.MultiSpriteAnimation;
 import infoObjects.SpriteFrame;
 import infoObjects.SpriteFrameSet;
-import javafx.util.Pair;
 import multiSprite.Frame.ImportFrameSelectionFrame;
 import multiSprite.Frame.MultiSpriteAnimationFrame;
 import multiSprite.Frame.MultiSpriteAnimationFrameSelectionFrame;

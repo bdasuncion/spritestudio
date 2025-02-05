@@ -217,14 +217,14 @@ public class SpriteFrame {
 	}
 	
 	private void drawModeDrawAt(int x, int y, int rgbVal) {
-		if (copyImageWidth == 1) {
-			editableImage.setRGB(x, y, rgbVal);
-		} else {
-			Graphics2D g = editableImage.createGraphics();
-			g.setColor(new Color(rgbVal));
-			//g.fillOval(x - radius/2, y - radius/2, radius, radius);
-			g.fillRect(x, y, copyImageWidth, copyImageWidth);
-		}
+		//if (copyImageWidth == 1) {
+		//	editableImage.setRGB(x, y, rgbVal);
+		//} else {
+		Graphics2D g = editableImage.createGraphics();
+		g.setColor(new Color(rgbVal));
+		//g.fillOval(x - radius/2, y - radius/2, radius, radius);
+		g.fillRect(x, y, copyImageWidth, copyImageHeight);
+		//}
 	}
 	
 	public void setImageBGTransparent(boolean isTransparent) {
