@@ -57,6 +57,7 @@ public class SpriteFrameCanvas extends JPanel
 		BufferedImage editableImage = spriteFrame.getImage();
 		super.paintComponent(g);
 		Graphics2D g2D =(Graphics2D)g;
+		//g2D.scale(2, 2);
 		BufferedImage disp;
 		disp = g2D.getDeviceConfiguration().
 				createCompatibleImage(editableImage.getHeight(),

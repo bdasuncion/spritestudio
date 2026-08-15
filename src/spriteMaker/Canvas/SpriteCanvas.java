@@ -20,6 +20,7 @@ import java.awt.image.Raster;
 import java.io.File;
 import java.io.IOException;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.DataBuffer;
@@ -30,7 +31,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
-public class SpriteCanvas extends JPanel implements CanvasInterface,
+public class SpriteCanvas extends JPanel implements CanvasInterface, KeyListener,
 	SelectRGBInterface
 {
 	/**
@@ -53,9 +54,13 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 	private boolean gridLineVisible = false;
 	private CanvasButtonPanelInterface canvasButtonPanelInterface;
 	private SpriteFrame spriteFrame;
+	private int imageMoveOffsetX = 32;
+	private int imageMoveOffsetY = 32;
 	ResizeInterface resizeInterface;
 	Color borderColor;
 	Timer colorChange;
+	private boolean moveImage = false;
+	private Point dragStart;
 	private class ColorChanger extends TimerTask {
 
 		int r = 0, g = 0, b = 0;
@@ -83,8 +88,10 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 		super();
 		this.resizeInterface = ri;
 		this.setSize(width,height);
-		this.enableEvents(AWTEvent.MOUSE_EVENT_MASK|AWTEvent.MOUSE_WHEEL_EVENT_MASK|AWTEvent.MOUSE_MOTION_EVENT_MASK|AWTEvent.KEY_EVENT_MASK);
+		//this.enableEvents(AWTEvent.MOUSE_EVENT_MASK|AWTEvent.MOUSE_WHEEL_EVENT_MASK|AWTEvent.MOUSE_MOTION_EVENT_MASK|AWTEvent.KEY_EVENT_MASK);
+		this.enableEvents(AWTEvent.MOUSE_EVENT_MASK|AWTEvent.MOUSE_WHEEL_EVENT_MASK|AWTEvent.MOUSE_MOTION_EVENT_MASK);
 		
+		this.addKeyListener(this);
 		bgImage = ImageTools.createMottledTile(
 				width, height, tileWidth, tileHeight);
 		bgCover = ImageTools.createEmptyImage(width, height, pixelSize);
@@ -228,6 +235,7 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 			return;
 		}
 		
+		g2D.translate(imageMoveOffsetX, imageMoveOffsetY);
 		g2D.scale(scale, scale);
 		//System.out.print("DISPLAY SPRITE FRAME ON CANVAS");
 		disp = g2D.getDeviceConfiguration().
@@ -305,11 +313,11 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 	}
 	
 	private int convertMouseX(MouseEvent e) {
-		return (e.getX()/scale);
+		return ((e.getX() - imageMoveOffsetX)/scale);
 	}
 	
 	private int convertMouseY(MouseEvent e) {
-		return (e.getY()/scale);
+		return ((e.getY() - imageMoveOffsetY)/scale);
 	}
 	
 	public void processMouseEvent(MouseEvent e){
@@ -324,12 +332,20 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 			spriteFrame.copyAt(convertMouseX(e), convertMouseY(e));
 			
 		} else if(e.getID() == MouseEvent.MOUSE_PRESSED && e.getButton() == MouseEvent.BUTTON1) {
-			if(e.getX()/scale < spriteFrame.getImage().getWidth() && 
-					e.getY()/scale < spriteFrame.getImage().getHeight()) {
+			int putX = convertMouseX(e);
+			int putY = convertMouseY(e);
+			System.out.println("PRESS X:" + putX + " Y:" + putY + " IM WIDTH:" + spriteFrame.getImage().getWidth() + " IM HEIGHT:" + spriteFrame.getImage().getHeight());
+			if(putX <= spriteFrame.getImage().getWidth()  && 
+				putY <= spriteFrame.getImage().getHeight()  && !moveImage) {
+				System.out.println("DRAW");
 				spriteFrame.drawAt(convertMouseX(e), convertMouseY(e), rgbVal);
 			}
+			if (!moveImage) {
 			startX = convertMouseX(e);
 			startY = convertMouseY(e);
+			} else {
+				dragStart = e.getPoint();
+			}
 			button1 = true;
 		}
 		repaint();
@@ -362,28 +378,37 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 		if(e.getID() == MouseEvent.MOUSE_DRAGGED && button1 == true){
 			int x = convertMouseX(e);
 			int y = convertMouseY(e);
-			drawLine(startX, startY, x, y);
-			startX = x;
-			startY = y;
-			displayX = x;
-			displayY = y;
+			if (!moveImage) {
+				drawLine(startX, startY, x, y);
+				startX = x;
+				startY = y;
+				displayX = x;
+				displayY = y;				
+			} else {
+				Point dragEnd = e.getPoint();
+				imageMoveOffsetX += dragEnd.x - dragStart.x;
+				imageMoveOffsetY += dragEnd.y - dragStart.y;
+				dragStart = dragEnd;
+			}
+			
 			this.repaint();
 		}
 	}
 	
-	public void processKeyEvent(KeyEvent e){
+	/*public void processKeyEvent(KeyEvent e){
 		if(e.getKeyCode() == KeyEvent.VK_UP){
 			scale++;
 		}
 		if(e.getKeyCode() == KeyEvent.VK_DOWN && scale > 1){
 			scale--;
 		}
+		
 		//this.setBounds(0, 0, this.getWidth(), this.getHeight());
 		this.setPreferredSize(new Dimension(this.getWidth()*scale, this.getHeight()*scale));
 		this.revalidate();		
 		this.repaint();
 		
-	}
+	}*/
 	
 	private void drawLine(double startX, double startY, double endX, double endY){
 		double xDist = startX - endX;
@@ -462,5 +487,30 @@ public class SpriteCanvas extends JPanel implements CanvasInterface,
 			this.setImageBGOpaque();
 		rgbVal = rgb;
 		this.repaint();
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		if ((e.getKeyCode() == KeyEvent.VK_CONTROL)) {
+			moveImage = !moveImage;
+			if (!moveImage ) {
+				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));	
+			} else {
+				setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));	
+			}
+		}
+		
 	}
 }

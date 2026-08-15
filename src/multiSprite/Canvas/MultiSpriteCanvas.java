@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.AffineTransform;
@@ -20,7 +22,7 @@ import componentInterface.UpdaterInterface;
 import infoObjects.SpriteFrame;
 import infoObjects.SpriteFrameSet;
 
-public class MultiSpriteCanvas extends JPanel implements MultiSpriteFrameInterface {
+public class MultiSpriteCanvas extends JPanel implements MultiSpriteFrameInterface, KeyListener {
 	
     private SpriteFrameSet spriteFrames;
     private int scale;
@@ -34,7 +36,7 @@ public class MultiSpriteCanvas extends JPanel implements MultiSpriteFrameInterfa
     	 //this.enableEvents(AWTEvent.MOUSE_EVENT_MASK|AWTEvent.MOUSE_WHEEL_EVENT_MASK);
     	 this.enableEvents(AWTEvent.MOUSE_WHEEL_EVENT_MASK);
     	 this.setVisible(true);
-    	 scale = 4;
+    	 scale = 6;
     	 //baseX = 32;
     	 //baseY = 16;
     	 baseX = 16;
@@ -43,6 +45,10 @@ public class MultiSpriteCanvas extends JPanel implements MultiSpriteFrameInterfa
     	 ShiftImage controls = new ShiftImage();
  		this.addMouseListener(controls);
  		this.addMouseMotionListener(controls);
+ 		this.addKeyListener(this);
+ 		
+ 		this.setFocusable(true);
+ 		this.requestFocusInWindow();
      }
     
     public void paintComponent(Graphics g) {
@@ -125,6 +131,22 @@ public class MultiSpriteCanvas extends JPanel implements MultiSpriteFrameInterfa
 		repaint();
 	}
 	
+	@Override
+	public void keyPressed(KeyEvent e) {
+		System.out.println("KEY PRESSED\n");
+		if (e.getKeyCode() == KeyEvent.VK_UP) {
+			//scale += 0.10;
+			++scale;
+	    } else if (e.getKeyCode() == KeyEvent.VK_DOWN && scale > 0.5) {
+	        //scale -= 0.10;
+	        --scale;
+	    }
+		this.setBounds(0, 0, this.getWidth(), this.getHeight());
+		this.setPreferredSize(new Dimension(this.getWidth(), this.getHeight()));
+		this.revalidate();
+		this.repaint();
+	}
+	
 	public void processMouseWheelEvent(MouseWheelEvent e) {
 		if(e.getWheelRotation()>0 && scale > 1){
 			scale--;
@@ -164,5 +186,27 @@ public class MultiSpriteCanvas extends JPanel implements MultiSpriteFrameInterfa
 			
 			repaint();
         }
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		System.out.println("KEY PRESSED\n");
+		if (e.getKeyCode() == KeyEvent.VK_UP) {
+			//scale += 0.10;
+			++scale;
+	    } else if (e.getKeyCode() == KeyEvent.VK_DOWN && scale > 1) {
+	        //scale -= 0.10;
+	        --scale;
+	    }
+		this.setBounds(0, 0, this.getWidth(), this.getHeight());
+		this.setPreferredSize(new Dimension(this.getWidth(), this.getHeight()));
+		this.revalidate();
+		this.repaint();
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		System.out.println("KEY RELEASED\n");
+		
 	}
 }
